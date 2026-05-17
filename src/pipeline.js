@@ -24,7 +24,7 @@ export const PIPELINE = {
       provider: 'llm_gemini',
       config: {
         profile: 'gemini-3_1-pro-preview',
-        '1-pro-preview': { apikey: 'REMOVED' },
+        '1-pro-preview': { apikey: import.meta.env.VITE_GEMINI_API_KEY },
         parameters: { google: {} },
       },
       input: [{ lane: 'questions', from: 'prompt_1' }],
