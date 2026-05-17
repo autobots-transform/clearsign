@@ -5,7 +5,7 @@ import Results from './components/Results'
 import './App.css'
 
 const API_ENDPOINT = 'http://localhost:5565/webhook'
-const API_KEY = 'REPLACED'
+const API_KEY = import.meta.env.VITE_API_KEY
 
 const STEPS = [
   'Uploading contract...',
