@@ -2,6 +2,7 @@ import { useState, useRef, useCallback } from 'react'
 import UploadZone from './components/UploadZone'
 import AnalysisLoader from './components/AnalysisLoader'
 import Results from './components/Results'
+import { saveMetric, getStats, parseScore } from './metrics'
 import './App.css'
 
 const API_ENDPOINT = 'http://localhost:5565/webhook'
@@ -19,6 +20,7 @@ function App() {
   const [results, setResults] = useState(null)
   const [fileName, setFileName] = useState('')
   const [error, setError] = useState('')
+  const [stats, setStats] = useState(() => getStats())
   const stepTimers = useRef([])
 
   const clearTimers = () => {
@@ -91,6 +93,12 @@ function App() {
       if (!data) throw new Error('No structured analysis returned from pipeline.')
 
       clearTimers()
+      saveMetric({
+        fileName: file.name,
+        riskScore: parseScore(data.risk_score),
+        highRiskClauseCount: data.high_risk_clauses?.length ?? 0,
+      })
+      setStats(getStats())
       setResults(data)
       setPhase('results')
     } catch (err) {
@@ -126,6 +134,22 @@ function App() {
             </button>
           )}
         </div>
+        {stats && (
+          <div className="stats-bar">
+            <span className="stats-item">
+              <span className="stats-value">{stats.total}</span>
+              Contracts Analyzed
+            </span>
+            <span className="stats-divider" />
+            <span className="stats-item">
+              Avg Risk Score <span className="stats-value">{stats.avgScore}</span>
+            </span>
+            <span className="stats-divider" />
+            <span className="stats-item">
+              High Risk <span className="stats-value stats-value--risk">{stats.highRiskPct}%</span>
+            </span>
+          </div>
+        )}
       </header>
 
       <main className="main">
